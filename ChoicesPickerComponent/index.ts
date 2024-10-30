@@ -1,4 +1,10 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
+import { ChoicesPickerC } from "./ChoicesPickerC";
+
+initializeIcons(undefined, { disableWarnings: true });
 
 export class ChoicesPickerComponent implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 

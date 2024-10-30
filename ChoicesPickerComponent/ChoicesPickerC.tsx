@@ -1,7 +1,7 @@
 import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
 import * as React from 'react';
 
-export interface ChoicesPickerComponentProps {
+export interface ChoicesPickerCProps {
     label: string;
     value: number | null;
     options: ComponentFramework.PropertyHelper.OptionMetadata[];
@@ -9,7 +9,7 @@ export interface ChoicesPickerComponentProps {
     onChange: (newValue: number | undefined) => void;
 }
 
-export const ChoicesPickerComponent = React.memo((props: ChoicesPickerComponentProps) => {
+export const ChoicesPickerC = React.memo((props: ChoicesPickerCProps) => {
     const { label, value, options, configuration, onChange } = props;
     const valueKey = value != null ? value.toString() : undefined;
     const items = React.useMemo(() => {
@@ -55,4 +55,4 @@ export const ChoicesPickerComponent = React.memo((props: ChoicesPickerComponentP
         </>
     );
 });
-ChoicesPickerComponent.displayName = 'ChoicesPickerComponent';
+ChoicesPickerC.displayName = 'ChoicesPickerC';
