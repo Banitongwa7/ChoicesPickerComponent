@@ -6,11 +6,23 @@ import { ChoicesPickerC } from "./ChoicesPickerC";
 
 initializeIcons(undefined, { disableWarnings: true });
 
+const SmallFormFactorMaxWidth = 350;
+
+const enum FormFactors {
+    Unknown = 0,
+    Desktop = 1,
+    Tablet = 2,
+    Phone = 3,
+  }
+
 export class ChoicesPickerComponent implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
-    /**
-     * Empty constructor.
-     */
+    notifyOutputChanged: () => void;
+    rootContainer: HTMLDivElement;
+    selectedValue: number | undefined;
+    context: ComponentFramework.Context<IInputs>;
+
+
     constructor()
     {
 
@@ -26,7 +38,15 @@ export class ChoicesPickerComponent implements ComponentFramework.StandardContro
      */
     public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement): void
     {
-        // Add control initialization code
+        this.notifyOutputChanged = notifyOutputChanged;
+        this.rootContainer = container;
+        this.context = context;
+        this.context.mode.trackContainerResize(true);
+    }
+
+    public onChange = (newValue: number | undefined) => {
+        this.selectedValue = newValue;
+        this.notifyOutputChanged();
     }
 
 
@@ -36,7 +56,31 @@ export class ChoicesPickerComponent implements ComponentFramework.StandardContro
      */
     public updateView(context: ComponentFramework.Context<IInputs>): void
     {
-        // Add code to update control view
+        const { value, configuration } = context.parameters;
+
+        let disabled = context.mode.isControlDisabled;
+        let masked = false;
+
+        if (value.security) {
+            disabled = disabled || !value.security.editable;
+            masked = !value.security.readable
+        }
+
+        if (value && value.attributes && configuration) {
+            ReactDOM.render(
+                React.createElement(ChoicesPickerC, {
+                    label: value.attributes.DisplayName,
+                    options: value.attributes.Options,
+                    configuration: configuration.raw,
+                    value: value.raw,
+                    onChange: this.onChange,
+                    disabled: disabled,
+                    masked: masked,
+                    formFactor: context.client.getFormFactor() == FormFactors.Phone || context.mode.allocatedWidth < SmallFormFactorMaxWidth ? 'small' : 'large',
+                }),
+                this.rootContainer,
+            );
+        }
     }
 
     /**
@@ -45,7 +89,9 @@ export class ChoicesPickerComponent implements ComponentFramework.StandardContro
      */
     public getOutputs(): IOutputs
     {
-        return {};
+        return {
+            value: this.selectedValue
+        } as IOutputs;
     }
 
     /**
@@ -54,6 +100,6 @@ export class ChoicesPickerComponent implements ComponentFramework.StandardContro
      */
     public destroy(): void
     {
-        // Add code to cleanup control if necessary
+        ReactDOM.unmountComponentAtNode(this.rootContainer);
     }
 }
